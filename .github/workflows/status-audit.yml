@@ -1,0 +1,18 @@
+name: Nemo UEFI status audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  status-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify device profile, claims, and artifact hygiene
+        run: python3 tools/status_audit.py
