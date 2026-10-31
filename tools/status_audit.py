@@ -24,7 +24,7 @@ try:
     tracked = subprocess.check_output(["git", "-C", str(root), "ls-files", "-z"]).decode().split("\0")
 except subprocess.CalledProcessError as exc:
     raise SystemExit("This audit must run in a Git checkout") from exc
-forbidden = {".fd", ".efi", ".img", ".bin", ".dtb", ".dtbo"}
+forbidden = {".fd", ".efi", ".dll", ".map", ".pdb", ".img", ".bin", ".dtb", ".dtbo"}
 artifacts = [p for p in tracked if p and (Path(p).suffix.lower() in forbidden or p.startswith("Build/"))]
 if artifacts:
     raise SystemExit("Do not track unverified firmware/device artifacts: " + ", ".join(artifacts))

@@ -1,6 +1,6 @@
 # Nemo UEFI — Realme 6 (RMX2001)
 
-This repository is the separate bring-up record for the Realme 6, codename Nemo, using MediaTek MT6785 / Helio G90T. It was split from the `nemo` branch of [rmx2151-salaa-uefi](https://github.com/iSciFiLite/rmx2151-salaa-uefi/tree/nemo) so Nemo's board evidence, memory map, build state, and compatibility claims cannot be confused with SALAA.
+This repository is the separate bring-up record for the Realme 6, codename Nemo, using MediaTek MT6785 / Helio G90T. It was split from the historical `nemo` branch state at [commit `73875bb`](https://github.com/iSciFiLite/rmx2151-salaa-uefi/tree/73875bbf4866c7f4ce9b62532052bf87c5783213) so Nemo's board evidence, memory map, build state, and compatibility claims cannot be confused with SALAA. The legacy branch now contains only a migration notice.
 
 **This repository does not yet contain a buildable UEFI firmware package. Nemo has not been booted with UEFI or HakiOS. Do not flash any SALAA image or reuse SALAA's configured FD, stack, or memory addresses.**
 
