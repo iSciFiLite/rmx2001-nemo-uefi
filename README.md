@@ -22,6 +22,10 @@ This repository is the separate bring-up record for the Realme 6, codename Nemo,
 
 The machine-readable summary is [`nemo-hardware.conf`](nemo-hardware.conf). It intentionally records unknown addresses as unknown instead of copying values from SALAA or another MT6785 phone.
 
+## Hardware-test record
+
+No RMX2001 has been tested with this project. There are no device boot logs, serial traces, GOP screenshots, UFS enumeration results, HakiOS boot results, or recovery-test results. All hardware-dependent roadmap gates below remain open; a passing hosted documentation audit is not hardware evidence.
+
 ## What is done
 
 - Established a dedicated public repository for RMX2001 UEFI work.
