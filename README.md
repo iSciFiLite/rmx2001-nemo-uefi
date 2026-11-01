@@ -93,7 +93,7 @@ No CI job can prove physical memory handoff, panel output, UFS signaling, or rec
 
 ## GitHub Actions
 
-The [Nemo status audit](https://github.com/iSciFiLite/rmx2001-nemo-uefi/actions/workflows/status-audit.yml) runs on pushes, pull requests, and manual dispatch. A [hosted run](https://github.com/iSciFiLite/rmx2001-nemo-uefi/actions/runs/41254374767) passed for commit `0ce8972`; it checks required status claims and ensures no generated firmware artifacts are tracked. It is not an EDK II build, emulator test, or hardware test. Firmware compilation will be added only when a complete Nemo platform package and reproducible upstream dependency set exist; calling the current documentation audit a firmware test would be misleading.
+The [Nemo status audit](https://github.com/iSciFiLite/rmx2001-nemo-uefi/actions/workflows/status-audit.yml) runs on pushes, pull requests, and manual dispatch. The latest [hosted run](https://github.com/iSciFiLite/rmx2001-nemo-uefi/actions/runs/41255751035) passed for commit `2d743f9`; it checks required status claims and ensures no generated firmware artifacts are tracked. It is not an EDK II build, emulator test, or hardware test. Firmware compilation will be added only when a complete Nemo platform package and reproducible upstream dependency set exist; calling the current documentation audit a firmware test would be misleading.
 
 ## License and safety
 
