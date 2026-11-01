@@ -72,7 +72,7 @@ The following are public hardware/software references, not proof of UEFI support
 - [Realme 6 postmarketOS/Linux port](https://github.com/Hari-Pi/realme6-pmos-port) and its [Nemo device tree](https://github.com/Hari-Pi/realme6-pmos-port/blob/main/linux-realme-nemo/mt6785-realme-nemo.dts). Its status reports Linux reaching initramfs and USB SSH while display support remains incomplete.
 - [Realme Nemo Android kernel repository](https://github.com/iSciFiLite/android_kernel_realme_nemo).
 - [Nemo firmware/device-tree dump index](https://github.com/shub876/realme_rmx2001_dump). This is a large external dump repository; no firmware image was downloaded or copied into this project. A DTS memory range is a reference, not a verified UEFI load map.
-- [SALAA UEFI project](https://github.com/iSciFiLite/rmx2151-salaa-uefi) for shared MT6785 research only; its fixed addresses and incomplete service set are not Nemo configuration.
+- [SALAA UEFI project](https://github.com/iSciFiLite/rmx2151-salaa-uefi) and its [sanitized F.11/live-DT evidence](https://github.com/iSciFiLite/rmx2151-salaa-uefi/blob/main/docs/salaa-device-evidence.md) for shared MT6785 research only. The recorded RAM reservations, UFS addresses, and panel identifiers are RMX2151-specific and do not establish Nemo's memory map or peripheral support.
 - [HakiOS MT6785](https://github.com/iSciFiLite/hakios-mt6785) for the current loader/kernel side.
 
 ## Roadmap
