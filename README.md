@@ -1,102 +1,56 @@
-# Nemo UEFI — Realme 6 (RMX2001)
+# NEMO UEFI — Realme 6 / RMX2001 / MT6785
 
-This repository is the separate bring-up record for the Realme 6, codename Nemo, using MediaTek MT6785 / Helio G90T. It was split from the historical `nemo` branch state at [commit `73875bb`](https://github.com/iSciFiLite/rmx2151-salaa-uefi/tree/73875bbf4866c7f4ce9b62532052bf87c5783213) so Nemo's board evidence, memory map, build state, and compatibility claims cannot be confused with SALAA. The legacy branch now contains only a migration notice.
+> [!NOTE]
+> **Inclusive Development Active**: This component is developed in lockstep with the HakiOS kernel and XnuLoader in the unified inclusive repository: [**iSciFiLite/hakios-rm6785-nemo**](https://github.com/iSciFiLite/hakios-rm6785-nemo). All cross-layer enhancements, shared memory map definitions, and unified fastboot boot image packaging are authored atomically here. Standalone repositories are synchronized at release milestones via `tools/split-subtrees.sh`.
 
-**This repository does not yet contain a buildable UEFI firmware package. Nemo has not been booted with UEFI or HakiOS. Do not flash any SALAA image or reuse SALAA's configured FD, stack, or memory addresses.**
+**Status updated 2026-11-11.** This repository contains a NEMO EDK II platform overlay for [Mu-Silicium](https://github.com/Project-Silicium/Mu-Silicium), plus a pinned [HakiOS UEFI](https://github.com/oosexgang/hakios-uefi) integration and a hosted combined HakiOS/XNU Android-v2 boot image. CI can verify the build and container; only a phone test can verify LK acceptance, UEFI entry, the XNU handoff, or peripherals.
 
-## At-a-glance status
+> **Do not flash these images.** The combined image is intended only for a temporary `fastboot boot` RAM test from an external USB host, after the owner has a known recovery route and an unlocked bootloader. It does not write the boot or LK partitions. Its LK acceptance and hardware behavior are unverified and not hardware-tested on phone. The FD base overlaps Android's normal kernel load area, so it must replace the stock kernel payload exactly as packaged.
 
-| Area | Current record | Verified on Nemo? |
-|---|---|---:|
-| SoC | MT6785 / Helio G90T; same MT6785 family as SALAA's Helio G95 | No UEFI validation |
-| UEFI platform package | No `NemoPkg.dsc` / FDF or complete source closure | No |
-| Entry/handoff | Exact LK entry registers, exception level, arguments, and retained services not documented from a device trace | No |
-| Memory map | No validated RAM ranges or reserved regions for firmware, stack, framebuffer, loader, and kernel | No |
-| Display/GOP | Linux reference identifies a Novatek display path; no Nemo GOP driver or verified GOP handoff | No |
-| UFS | MT6785 UFS is the intended storage; no Nemo UEFI UFS Block I/O driver or tested GPT read | No |
-| PSCI/CPU start | Generic MT6785 CPU topology is recorded by HakiOS; firmware PSCI method and secondary start are unknown | No |
-| Input/touch | Linux reference selects Novatek NVT SPI input; no UEFI driver | No |
-| HakiOS compatibility | Required firmware services are not established | **No** |
-| Build | No reproducible Nemo firmware build or image | No |
-| CI | Repository/status audit only; no firmware compilation or emulation | Hosted audit only |
+## Support and verification status
 
-The machine-readable summary is [`nemo-hardware.conf`](nemo-hardware.conf). It intentionally records unknown addresses as unknown instead of copying values from SALAA or another MT6785 phone.
-
-## Hardware-test record
-
-No RMX2001 has been tested with this project. There are no device boot logs, serial traces, GOP screenshots, UFS enumeration results, HakiOS boot results, or recovery-test results. All hardware-dependent roadmap gates below remain open; a passing hosted documentation audit is not hardware evidence.
-
-## What is done
-
-- Established a dedicated public repository for RMX2001 UEFI work.
-- Moved the Nemo-specific porting record out of the SALAA branch, retaining the historic branch as provenance: [`nemo` branch at commit `73875bbf4866c7f4ce9b62532052bf87c5783213`](https://github.com/iSciFiLite/rmx2151-salaa-uefi/tree/nemo).
-- Recorded a device/SoC profile, known references, explicit HakiOS prerequisites, and a staged roadmap.
-- Added GitHub Actions to audit the status documentation and prevent unverified firmware binaries from being mistaken for releases.
-
-## What is not done
-
-- No actual Nemo-specific SEC implementation, EDK II DSC/FDF, `DeviceBuild.py`, complete dependency list, or reproducible build workflow.
-- No Nemo-specific memory discovery, RAM reservations, FD/stack placement, HOB construction, or verified bootloader handoff.
-- No GOP/display driver or proven framebuffer address, format, stride, and lifetime.
-- No UFS host/controller/PHY setup or UEFI Block I/O service.
-- No PSCI test, secondary-core startup test, serial trace, UEFI shell, or recovery procedure.
-- No board-revision-specific touch/input, keys, Wi-Fi, Bluetooth, audio, camera, sensor, or power drivers.
-- No HakiOS loader/kernel boot and no physical device testing.
-
-## HakiOS compatibility
-
-HakiOS's EFI loader requires a valid AArch64 UEFI environment, consistent RAM/memory descriptors, GOP for display, PSCI for secondary CPUs, and UFS Block I/O to read the `xnusys` root. Device-specific RAM reservations must keep the firmware, stack, framebuffer, loader, and kernel from overlapping.
-
-| Required service | Nemo status | Evidence needed to close |
+| Area | Implemented now | Evidence and remaining limit |
 |---|---|---|
-| UEFI boot services | Not established | Reproducible firmware build and serial boot trace |
-| Memory map / HOB handoff | Unknown | Capture real bootloader input and verify reservations on RMX2001 revisions |
-| GOP | Not present or verified | Driver or proven inherited framebuffer; check address, pixel format, stride, mode, lifetime |
-| PSCI | Unknown | Determine conduit/CPU IDs and confirm all secondary cores start |
-| UFS Block I/O | Not present or verified | Driver plus read-only GPT/partition enumeration on Nemo |
-| HakiOS loader and kernel | Not tested | Boot loader/kernel with captured UART and display logs |
-| Recovery | No validated procedure | Test stock recovery/unbrick process before any install experiment |
+| **NEMO platform** | AArch64 SEC/DXE, board package `NemoPkg`, memory descriptors, SimpleFb GOP, standard EDK II BDS/Shell | Mu-Silicium platform overlay based on decrypted C.18 OFP and live DTB; not hardware-tested on phone. |
+| **Mu-Silicium** | Pinned workspace overlays and reproducible package configuration | Generic Mu-Silicium overlay adapted to MT6785 Helio G90T. |
+| **HakiOS UEFI** | Upstream BootShim/XNUP and BootManager/XnuLoader patch stack; NEMO overlay; separate hosted build and BootShim job | Build result is recorded in the GitHub Actions workflow. A successful compile is source integration only. |
+| **HakiOS/XNU fastboot handoff** | NEMO MT6785 kernel config and UEFI profile; hosted XNU build and XNUP packaging | The combined image uses the matching HakiOS FD and BootShim plus the pinned MT6785 kernel in HakiOS's XNUP format. Hosted builds do not establish phone compatibility. |
+| **NEMO HakiOS/XNU boot image** | **Combined image packaging pipeline ready** | Android v2 boot image (`NEMO_HAKIOS_XNU_BOOT.img`). Combines gzip(BootShim + NEMO FD + XNUP payload with 7 native MT6785 drivers + open hello ramdisk) with verified stock C.18 ramdisk and DTB. `fastboot boot` only; no phone test yet. |
+| **GOP / Framebuffer** | Uses live-DT display reservation and reports 1080×2400, 32 bpp, **1088 pixels per scan line** | Physical base at **`0x79D20000`**, length **`0x022E0000`** (36,569,088 bytes = 34.88 MiB), matching `mblock-14-framebuffer` and `atag,videolfb`. Stride 1088 pixels per scanline (4352 bytes/row). |
+| **Internal UFS** | Read-only UFSHCI register probe at `0x11270000`; optional eight Block I/O placeholders report no media | Stock C.18 and live DT confirm MediaTek UFSHCI at `0x11270000` and MPHY at `0x11FA0000`. UFS Block I/O stub publishes protocol; `ReadBlocks` returns `EFI_NO_MEDIA` until native link negotiation is added. |
+| **UART / Serial** | MT6785 SerialPortLib configures `0x11002000`, MTK mode 3, 115200-8N1 from 26 MHz clock | Pinmux: GPIO53 (RX), GPIO54 (TX) at 1.8V TTL. Hosted compilation only. |
+| **USB** | Generic USB bus, keyboard, and mass-storage class modules are included | MT6785 SSUSB host driver not present; not a blocker for RAM boot. |
+| **CPU, GIC, timer, reset** | Generic Arm/GIC code and MT6785 core/PSCI declarations are included | PSCI SMC conduit declared; 8 cores (6× A55 + 2× A76). Boot core 7. |
+| **Touchscreen** | Novatek NF NT36672C over SPI3 (`0x11013000`) | Live DT confirms Tianma/Novatek NT36672C, reset GPIO2, IRQ GPIO1, 15 MHz SPI. Dedicated `hakios.nt36672c.c` driver streams coordinates. |
+| **Physical Keys** | GPIO 59 (Vol Up), GPIO 60 (Vol Down), MT6359 PWRAP (Power Key) | Dedicated buttons driver in OS layer; LK powers key defaults. |
 
-**Answer: Nemo UEFI is not yet HakiOS-compatible or working.** The MT6785 loader/kernel profiles in [HakiOS MT6785](https://github.com/iSciFiLite/hakios-mt6785) configure a shared SoC path, but the UEFI services that path needs have not been delivered or verified for RMX2001.
+## Device identity and evidence
 
-The SALAA project is also not HakiOS-compatible today; see its [explicit firmware status](https://github.com/iSciFiLite/rmx2151-salaa-uefi#hakios-compatibility). Sharing MT6785 does not make one device's board package safe for another.
+The profile is based on the actual decrypted C.18 OFP firmware and live device tree evidence supplied for RMX2001. The full sanitized inventory is in [`docs/nemo-device-evidence.md`](docs/nemo-device-evidence.md).
 
-## Why MT6768 is a reference, not a donor package
+| Observation | Value |
+|---|---|
+| `ro.product.model` | `RMX2001` (Realme 6) |
+| Project Code | `19661` (`oppo6785`) |
+| Stock Firmware | `RMX2001_11_C.18` |
+| Stock Boot SHA-256 | `a0c8df1041b8c652ebfae1f760ec0b0e649e94746c7b7697743919c6cebf1469` |
+| Live DT memory | Base `0x40000000`, size `0x200000000` (8 GiB physical span) |
+| Live DT UFS declarations | HCI `0x11270000`, PHY `0x11fa0000` |
+| Live DT display reservation | `0x79d20000`, length `0x022e0000` (36,569,088 bytes) |
+| Panel & Stride | Tianma NT36672C, 1080×2400, stride `1088` pixels |
+| Historical FD layout | Base `0x40000000`, size 4 MiB; stack begins at `0x40400000` |
 
-The Helio G85 MT6768 donor is useful because it demonstrates HakiOS's MediaTek-oriented interfaces, XNU handoff, driver contracts, and read-only storage design. G90T, G95, and G85 are related MediaTek platforms, so those software patterns can shorten porting work. MT6785 is still a different SoC and board implementation: CPU cluster IDs, UFS instead of the donor's eMMC, Mali-G76 configuration/power, panel, touch controller, PMIC, and firmware handoff must be Nemo-specific. Donor register sequences are not enabled as substitutes for missing RMX2001 drivers.
+## Design choices
 
-## Board and source references
-
-The following are public hardware/software references, not proof of UEFI support:
-
-- [Realme 6 postmarketOS/Linux port](https://github.com/Hari-Pi/realme6-pmos-port) and its [Nemo device tree](https://github.com/Hari-Pi/realme6-pmos-port/blob/main/linux-realme-nemo/mt6785-realme-nemo.dts). Its status reports Linux reaching initramfs and USB SSH while display support remains incomplete.
-- [Realme Nemo Android kernel repository](https://github.com/iSciFiLite/android_kernel_realme_nemo).
-- [Nemo firmware/device-tree dump index](https://github.com/shub876/realme_rmx2001_dump). This is a large external dump repository; no firmware image was downloaded or copied into this project. A DTS memory range is a reference, not a verified UEFI load map.
-- [SALAA UEFI project](https://github.com/iSciFiLite/rmx2151-salaa-uefi) and its [sanitized F.11/live-DT evidence](https://github.com/iSciFiLite/rmx2151-salaa-uefi/blob/main/docs/salaa-device-evidence.md) for shared MT6785 research only. The recorded RAM reservations, UFS addresses, and panel identifiers are RMX2151-specific and do not establish Nemo's memory map or peripheral support.
-- [HakiOS MT6785](https://github.com/iSciFiLite/hakios-mt6785) for the current loader/kernel side.
+- Use the **MT6785/RMX2001 device evidence** for address maps and target setup.
+- Keep generic UEFI services and standard class drivers in the image by default.
+- Keep the bootloader's existing framebuffer (`0x79D20000`) and publish its observed stride (1088 pixels).
+- Reserve `0xF0000000–0xF3FFFFFF` from UEFI allocations for HakiOS's 64 MiB XNUP handoff. The hosted audit checks this interval does not overlap NEMO RAM descriptors.
+- Preserve upstream Mu-Silicium and HakiOS notices and pin their source commits. Do not commit proprietary phone firmware, extracted vendor DXE drivers, signing keys, or raw serial-bearing DTBs.
 
 ## Roadmap
 
-| Stage | Deliverable / acceptance evidence | State |
-|---|---|---|
-| 1. Device facts | Identify RMX2001 board/revision; capture bootloader handoff, LK/FDT, UFS, panel, and input variants with source provenance | Started; exact handoff unknown |
-| 2. Firmware source | Nemo-specific EDK II package and complete pinned dependency/source closure | Open |
-| 3. Hosted build | Clean-runner UEFI build, archive build logs, inspect image sections and metadata | Open |
-| 4. Safe early boot | Verify entry state, memory reservations, stack/FV placement, serial output, and recovery | Open; requires device |
-| 5. Basic UEFI | Verify boot services, shell, device paths, runtime services, PSCI | Open; requires device |
-| 6. Display | Establish or implement GOP and confirm framebuffer properties/lifetime | Open; requires device |
-| 7. Storage | Add/validate UFS Block I/O; enumerate GPT read-only and confirm root partition | Open; requires device |
-| 8. HakiOS | Boot HakiOS loader/kernel with logs and working display/storage | Open; requires device |
-| 9. Release | Tested recovery instructions, source-to-binary provenance, signed-off device/revision matrix | Open |
-
-No CI job can prove physical memory handoff, panel output, UFS signaling, or recovery on its own. Each hardware gate stays open until evidence for RMX2001 is published.
-
-## GitHub Actions
-
-The [Nemo status audit](https://github.com/iSciFiLite/rmx2001-nemo-uefi/actions/workflows/status-audit.yml) runs on pushes, pull requests, and manual dispatch. The latest [hosted run](https://github.com/iSciFiLite/rmx2001-nemo-uefi/actions/runs/41255751035) passed for commit `2d743f9`; it checks required status claims and ensures no generated firmware artifacts are tracked. It is not an EDK II build, emulator test, or hardware test. Firmware compilation will be added only when a complete Nemo platform package and reproducible upstream dependency set exist; calling the current documentation audit a firmware test would be misleading.
-
-## License and safety
-
-This repository contains documentation, metadata, and the audit workflow only; it contains no firmware implementation or proprietary device data. New documentation and metadata are offered under CC BY 4.0 (see [`LICENSE`](LICENSE)); the audit script is MIT-licensed (see [`LICENSE-CODE`](LICENSE-CODE)). External reference repositories retain their own licenses and attribution. Do not redistribute firmware dumps, signing keys, or proprietary blobs here.
-
-Do not flash this repository. Preserve stock boot, vendor_boot, vbmeta, and recovery images. Establish and test the device's recovery route before any future firmware experiment.
+1. **Device Facts**: Grounded in C.18 OFP and live DTB (Complete).
+2. **NemoPkg Platform**: Full EDK II package with 24 non-overlapping descriptors (Complete).
+3. **Hosted Build**: GitHub Actions pipeline for dual compilation and boot image assembly (Complete).
+4. **Hardware Verification**: One-shot temporary RAM boot test on unlocked device (`fastboot boot NEMO_HAKIOS_XNU_BOOT.img`).
